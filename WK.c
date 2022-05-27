@@ -158,9 +158,13 @@ int connected_components_count(unsigned char** thresh_image, int width, int heig
     return current_label - 1;
 }
 
-int main() {
+int main(int argc, char** argv) {
     errno_t err;
     FILE * grayscale_output, *blured_output,*thresh_output, *in;
+    char* input_path = "bactery_colony_input.ppm";
+    if (argc > 1) {
+        input_path = argv[1];
+    }
     err = fopen_s(&grayscale_output,"grayscale_output.ppm", "wb");
     if (err || grayscale_output == NULL) {
         printf("Cant open grayscale output image");
@@ -176,14 +180,21 @@ int main() {
         printf("Cant open thresh output image");
         return -1;
     }
-    err = fopen_s(&in,"bactery_colony_input.ppm", "rb");
+    err = fopen_s(&in, input_path, "rb");
     if (err || in == NULL) {
         printf("Cant open input image");
         return -1;
     }
     int width, height, max_colour;
+    char line[256];
+    fgets(line, sizeof(line), in);
     // Add meta information to output files
-    fscanf_s(in, "P6\n %d %d %d", &width, &height, &max_colour);
+    int i = 0;
+    while (!fscanf_s(in, "%d %d %d", &width, &height, &max_colour) || i > 5) {
+        // Dont read comments
+        fgets(line, sizeof(line), in);
+        i++;
+    }
     fprintf(grayscale_output, "P6\n%d %d\n%d\n", width, height, 255);
     fprintf(blured_output, "P6\n%d %d\n%d\n", width, height, 255);
     fprintf(thresh_output, "P6\n%d %d\n%d\n", width, height, 255);
