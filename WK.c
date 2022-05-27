@@ -6,6 +6,9 @@ const int BACTERIA_VALUE = 255;
 const int BACKGROUND_VALUE = 0;
 
 unsigned char** add_padding(char** img,int width, int height) {
+    /*
+    Adds 1 pixel padding to image and returns, padded one
+    */
     unsigned char** padded_image = (unsigned char**)calloc((height + 2), sizeof(unsigned char*));
     for (int i = 0; i < height + 2; i++) {
         if (padded_image) {
@@ -21,6 +24,12 @@ unsigned char** add_padding(char** img,int width, int height) {
 }
 
 unsigned char** to_grayscale(FILE* img, int width, int height, FILE* out) {
+    /*
+    Converts image to grayscale. Also saves modified image on disk.
+
+    img: Image to convert
+    out: File to save grayscale image
+    */
     unsigned char** gray_scale_image = (unsigned char**)malloc(height * sizeof(unsigned char* ));
     for (int i = 0; i < height; i++) {
         gray_scale_image[i] = (unsigned char*)malloc(width * sizeof(unsigned char));
@@ -40,6 +49,12 @@ unsigned char** to_grayscale(FILE* img, int width, int height, FILE* out) {
 }
 
 unsigned char** gaussian_blur_with_threshhold(unsigned char** grayscale_img, int width, int height, FILE* blured_out, FILE* thresh_out,int threshhold) {
+    /*
+    Applies gaussian blur and threshoold based on given value. Also saves blured image and thresholded image.
+
+    blured_out: File to save blured image
+    thresh_out: File to save thresholded image
+    */
     unsigned char** blured_image = (unsigned char**)malloc((height) * sizeof(unsigned char*));
     for (int i = 0; i < height; i++) {
         if (blured_image) {
@@ -89,6 +104,9 @@ unsigned char** gaussian_blur_with_threshhold(unsigned char** grayscale_img, int
 }
 
 int connected_components_count(unsigned char** thresh_image, int width, int height) {
+    /*
+    Counts number of bacterias using connected componets method.
+    */
     unsigned char** labels = (unsigned char**)calloc(height, sizeof(unsigned char*));
     for (int i = 0; i < height; i++) {
         labels[i] = (unsigned char*)calloc(width, sizeof(unsigned char));
@@ -150,6 +168,7 @@ int main() {
         return -1;
     }
     int width, height, max_colour;
+    // Add meta information to output files
     fscanf_s(in, "P6\n %d %d %d", &width, &height, &max_colour);
     fprintf(grayscale_output, "P6\n%d %d\n%d\n", width, height, 255);
     fprintf(blured_output, "P6\n%d %d\n%d\n", width, height, 255);
