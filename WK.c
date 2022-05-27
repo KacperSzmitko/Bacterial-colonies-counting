@@ -100,6 +100,13 @@ unsigned char** gaussian_blur_with_threshhold(unsigned char** grayscale_img, int
             fputc(thresh_image[i - 1][j - 1], thresh_out);
         }
     }
+    for (int i = 0; i < height; i++) {
+      free(blured_image[i]);
+    }    for (int i = 0; i < height + 2; i++) {
+      free(padded_image[i]);
+    }
+    free(blured_image);
+    free(padded_image);
     return thresh_image;
 }
 
@@ -114,7 +121,7 @@ int connected_components_count(unsigned char** thresh_image, int width, int heig
     char** padded_image = add_padding(thresh_image, width, height);
     int current_label = 1;
     int neigbour_count = 0;
-    int neighbour_check[400];
+    int* neighbour_check = calloc((width) * (height), sizeof(int));
     for (int i = 1; i < height + 1; i++) {
         for (int j = 1; j < width + 1; j++) {
             if ((int)padded_image[i][j] != BACKGROUND_VALUE && labels[i - 1][j - 1] == 0){
@@ -141,6 +148,13 @@ int connected_components_count(unsigned char** thresh_image, int width, int heig
             }
         }
     }
+    for (int i = 0; i < height; i++) {
+        if (labels) {
+            free(labels[i]);
+        }
+    }
+    free(neighbour_check);
+    free(labels);
     return current_label - 1;
 }
 
@@ -175,14 +189,18 @@ int main() {
     fprintf(thresh_output, "P6\n%d %d\n%d\n", width, height, 255);
 
     unsigned char** gray_scale_image = to_grayscale(in, width, height, grayscale_output);
-    unsigned char** thresh_image = gaussian_blur_with_threshhold(gray_scale_image, width, height, blured_output, thresh_output, 145);
-    int number_of_bacterias = connected_components_count(thresh_image, width, height);
-    printf("Number of bacterias: %d", number_of_bacterias);
-    free(gray_scale_image);
-    free(thresh_image);
+    fclose(in);
     fclose(grayscale_output);
+    unsigned char** thresh_image = gaussian_blur_with_threshhold(gray_scale_image, width, height, blured_output, thresh_output, 145);
     fclose(blured_output);
     fclose(thresh_output);
-    fclose(in);
+    int number_of_bacterias = connected_components_count(thresh_image, width, height);
+    printf("Number of bacterias: %d", number_of_bacterias);
+    for (int i = 0; i < height; i++) {
+        free(gray_scale_image[i]);
+        free(thresh_image[i]);
+    }
+    free(gray_scale_image);
+    free(thresh_image);
     return number_of_bacterias;
 }
