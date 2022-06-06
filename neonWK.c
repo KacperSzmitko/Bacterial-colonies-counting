@@ -81,7 +81,6 @@ unsigned char** to_grayscale(FILE* img, int width, int height, FILE* out) {
         for(int j = 0; j < width; j++)
         {
             image_write_2d[i][j] = image_write[k++];
-            //fputc(image_write_2d[i][j],out);
         }
     }
     return image_write_2d;
@@ -273,3 +272,4 @@ int main(int argc, char** argv) {
 	
     return number_of_bacterias;
 }
+
