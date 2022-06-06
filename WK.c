@@ -2,22 +2,28 @@
 #include <string.h>
 #include <stdlib.h>
 
-const int BACTERIA_VALUE = 255;
-const int BACKGROUND_VALUE = 0;
+const int BACTERIA_VALUE = 0;
+const int BACKGROUND_VALUE = 255;
 
 unsigned char** add_padding(char** img,int width, int height) {
     /*
     Adds 1 pixel padding to image and returns, padded one
     */
-    unsigned char** padded_image = (unsigned char**)calloc((height + 2), sizeof(unsigned char*));
+    unsigned char** padded_image = (unsigned char**)malloc((height + 2) * sizeof(unsigned char*));
     for (int i = 0; i < height + 2; i++) {
         if (padded_image) {
-            padded_image[i] = (unsigned char*)calloc((width + 2), sizeof(unsigned char));
+            padded_image[i] = (unsigned char*)malloc((width + 2) * sizeof(unsigned char));
         }
     }
-    for (int i = 1; i < height; i++) {
-        for (int j = 1; j < width; j++) {
-            padded_image[i][j] = img[i - 1][j - 1];
+    for (int i = 0; i < height + 2; i++) {
+        for (int j = 0; j < width + 2; j++) {
+            if (i == 0 || j == 0 || i == height + 1 || j == width + 1) {
+                padded_image[i][j] = BACKGROUND_VALUE;
+            }
+            else {
+                padded_image[i][j] = img[i - 1][j - 1];
+            }
+            
         }
     }
     return padded_image;
@@ -118,7 +124,7 @@ int connected_components_count(unsigned char** thresh_image, int width, int heig
     for (int i = 0; i < height; i++) {
         labels[i] = (unsigned char*)calloc(width, sizeof(unsigned char));
     }
-    char** padded_image = add_padding(thresh_image, width, height);
+    unsigned char** padded_image = add_padding(thresh_image, width, height);
     int current_label = 1;
     int neigbour_count = 0;
     int* neighbour_check = calloc((width) * (height), sizeof(int));
